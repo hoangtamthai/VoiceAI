@@ -11,11 +11,12 @@ WIDTH_RATIO = 0.5
 HEIGHT_RATIO = 0.2
 OFFSET_X_RATIO = round((1 - WIDTH_RATIO) / 2, 2)
 OFFSET_Y_RATIO = 0.6
+SUBTITLE_FONT = str(getenv("SUBTITLE_FONT"))
 SUBTITLE_FONT_SIZE = int(getenv("SUBTITLE_FONT_SIZE"))
 SUBTITLE_COLOR = getenv("SUBTITLE_COLOR")
 SUBTITLE_BG_COLOR = getenv("SUBTITLE_BG_COLOR")
 SACRIFICIAL_COLOR = getenv("SACRIFICIAL_COLOR")
-WRAP_SIZE = 100 / (SUBTITLE_FONT_SIZE * 0.1)
+WRAP_SIZE = 110 / (SUBTITLE_FONT_SIZE * 0.1)
 
 
 def subtitle_updater(root: tk.Tk, queue, labels: list[tk.Label]):
@@ -31,24 +32,19 @@ def subtitle_updater(root: tk.Tk, queue, labels: list[tk.Label]):
 
         # create subtitle based on message in queue
         msg_data = queue.get()
-        if (
-            isinstance(msg_data, dict)
-            and "origin" in msg_data
-            and "translation_format" in msg_data
-        ):
-            orig = textwrap.fill(str(msg_data["origin"]), WRAP_SIZE)
-            translation = msg_data["translation_format"]
-            display_text = orig
-            if translation != "":
-                trans = textwrap.fill(str(translation), WRAP_SIZE)
-                display_text = f"{orig}\n{trans}"
-        else:
-            display_text = textwrap.fill(
-                str(msg_data.get("origin", msg_data)), WRAP_SIZE
-            )
+        origin = msg_data["origin"]
+        orig_text = textwrap.fill(str(origin), WRAP_SIZE)
+        display_text = f"{orig_text}"
+
+        translation = msg_data["translation_format"]
+        if translation != "":
+            trans_text = textwrap.fill(str(translation), WRAP_SIZE)
+            display_text = f"{orig_text}\n{trans_text}"
+
         new_label = tk.Label(
             text=display_text,
-            font=("Comic Sans MS", SUBTITLE_FONT_SIZE, "bold"),
+            # font=("Comic Sans MS", SUBTITLE_FONT_SIZE, "bold"),
+            font=(SUBTITLE_FONT, SUBTITLE_FONT_SIZE),
             fg=SUBTITLE_COLOR,
             bg=SUBTITLE_BG_COLOR,
             justify=tk.LEFT,
@@ -62,7 +58,7 @@ def subtitle_updater(root: tk.Tk, queue, labels: list[tk.Label]):
         # new_label.after(label_time, root.withdraw)
 
         # place subtitle at top middle of screen
-        new_label.pack(side="top", anchor="n", fill=tk.X, expand=True)
+        new_label.pack(side="top", anchor="n", fill=tk.X)
         labels.append(new_label)
         root.update_idletasks()
 

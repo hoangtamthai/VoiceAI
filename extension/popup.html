@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Audio Capture Extension</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      width: 250px;
+      text-align: center;
+      padding: 10px;
+    }
+    h1 {
+      font-size: 18px;
+      margin-bottom: 15px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    #status {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    .error {
+      color: red;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Audio Capture</h1>
+  <button id="startBtn">Start Recording</button>
+  <button id="stopBtn" disabled>Stop Recording</button>
+  <div id="status"></div>
+  <div id="error" class="error"></div>
+  <script src="popup.js"></script>
+</body>
+</html>

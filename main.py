@@ -7,7 +7,9 @@ from threading import Thread
 
 import click
 import numpy as np
+import soundcard as sc
 import sounddevice
+import soundfile as sf  # To save the file
 import speech_recognition as sr
 import torch
 from pydub import AudioSegment
@@ -106,7 +108,8 @@ def main(
         print(sounddevice.query_devices())
     for i in result:
         print(i, result[i])
-    device_index = int(input("Please choose an input source for audio: "))
+    # device_index = int(input("Please choose an input source for audio: "))
+    device_index = 1
     record_process = Thread(
         target=record_audio,
         args=(
@@ -169,7 +172,14 @@ def record_audio(
     r.dynamic_energy_threshold = dynamic_energy
     r.operation_timeout = record_timeout
     # r.non_speaking_duration = 0.05
-    with sr.Microphone(device_index=device) as source:
+    samplerate = 48000
+    record_sec = 5
+
+    # Get the default speaker and its loopback interface
+    with sc.get_microphone(
+        id=sc.default_speaker().name, include_loopback=True
+    ).recorder(samplerate=samplerate) as source:
+        # with sr.Microphone(device_index=device) as source:
         # print("Adjusting for ambient noise...")
         # r.adjust_for_ambient_noise(source, duration=5)
         # print("Finish adjusting")
@@ -178,14 +188,18 @@ def record_audio(
             # get and save audio to wav file
             if verbose:
                 print("Listening...")
-            audio = r.listen(source, phrase_time_limit=record_timeout)
+            # audio = r.listen(source, phrase_time_limit=record_timeout)
             if save_file:
-                data = io.BytesIO(audio.get_wav_data())
-                audio_clip = AudioSegment.from_file(data)
+                data = source.record(
+                    numframes=samplerate * record_sec,
+                )
+                # data = io.BytesIO(audio.get_wav_data())
+                # audio_clip = AudioSegment.from_file(data)
                 filename = os.path.join(temp_dir, f"temp{i}.wav")
+                sf.write(filename, data, samplerate)
                 if verbose:
                     print(filename)
-                audio_clip.export(filename, format="wav")
+                # audio_clip.export(filename, format="wav")
                 audio_data = filename
             else:
                 torch_audio = torch.from_numpy(

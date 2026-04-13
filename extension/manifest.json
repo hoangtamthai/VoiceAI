@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "Audio Capture Extension",
+  "version": "1.0",
+  "description": "Captures audio playing in the tab and sends it to a server.",
+  "permissions": [
+    "tabCapture",
+    "activeTab",
+    "scripting",
+    "storage",
+    "offscreen"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Audio Capture Extension"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ]
+}
